@@ -5,36 +5,39 @@ import Person from './Person/Person';
 class App extends Component {
   state = {
     persons: [
-      { name: 'Max', age: 28 },
-      { name: 'Manu', age: 29 },
-      { name: 'Stephanie', age: 26 }
+      { id: 1, name: 'Max', age: 28 },
+      { id: 2, name: 'Manu', age: 29 },
+      { id:3, name: 'Stephanie', age: 26 }
     ],
     otherState: 'some other value',
     showPersons: true
   };
 
-  switchNameHandler = (newName) => {
-    // console.log('Was clicked!');
-    // DON'T DO THIS: this.state.persons[0].name = 'Maximilian';
-    this.setState({
-      persons: [
-        { name: newName, age: 28 },
-        { name: 'Manu', age: 29 },
-        { name: 'Stephanie', age: 27 }
-      ]
+deletePersonHandler = (personIndex) => {
+  const persons = [...this.state.persons];
+  persons.splice(personIndex, 1);
+  this.setState({persons: persons})
+
+}
+
+  nameChangedHander = (event, id) => {
+    // function looks for id in state as compared to id passed in for each index. the index is stored in variable
+    const personIndex = this.state.persons.findIndex( p =>{
+      return p.id === id;
     });
+    // person is from a DUPLICATE OF the array. const person is the index here
+    const person = {
+      ...this.state.persons[personIndex]
+    };
+    // the alternative is object.assign
+    // const person = Object.assign({}, this.state.persons[personIndex]);
+    // person .name is change (the copy of the array) 
+    person.name = event.target.value;
+    const persons = [...this.state.persons];
+    persons[personIndex] = person; // asign index with NEW person
+    this.setState({persons: persons}) // now setstae
+    
   };
-
-  nameChangedHander = (event) => {
-    this.setState({
-      persons: [
-        { name: 'Max', age: 28 },
-        { name: event.target.value, age: 29 },
-        { name: 'Stephanie', age: 27 }
-      ]
-
-    })  
-  }
 
   togglePersonsHandler = (event) => {
     const doesShow = this.state.showPersons;
@@ -56,17 +59,19 @@ class App extends Component {
     if ( this.state.showPersons ) {
       persons = (
         <div>
-          <Person
-            name={this.state.persons[0].name}
-            age={this.state.persons[0].age} />
-          <Person
-            name={this.state.persons[1].name}
-            age={this.state.persons[1].age}
-            click={this.switchNameHandler.bind( this, 'Max!' )}
-            changed={this.nameChangedHandler} >My Hobbies: Racing</Person>
-          <Person
-            name={this.state.persons[2].name}
-            age={this.state.persons[2].age} />
+          {this.state.persons.map((person, index) =>{
+            return <Person
+            /* arrow function so you can pass index as a parameter,
+            bind is an alternative */
+            click={() => this.deletePersonHandler(index)}
+            name={person.name}
+            age={person.age}
+            /* The key helps react. let's it compare elements of future with elements pf past and
+            only update when it needs to update  */
+            key={person.id} 
+            /* anonymous function that passes on event and person.id */
+            changed = {(event) => this.nameChangedHander(event, person.id)}/>
+          })}
         </div>
       );
     }
