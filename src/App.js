@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Radium, { StyleRoot } from 'radium';
 import './App.css';
 import Person from './Person/Person';
 
@@ -47,10 +48,16 @@ deletePersonHandler = (personIndex) => {
 
   render() {
     const style = {
-      backgroundColor: 'white',
+      backgroundColor: 'green',
       font: 'Helvetica',
       padding: '8px',
-      cursor: 'pointer'
+      cursor: 'pointer',
+      color: 'white',
+      ':hover': {
+        backgroundColor: 'white',
+        color: 'black'
+      },
+      'transition': '.5s'
     }
 
     let persons = null;
@@ -74,18 +81,34 @@ deletePersonHandler = (personIndex) => {
           })}
         </div>
       );
+      // dynamically change style object
+      style.backgroundColor = "red";
+      style[':hover'] = {
+        backgroundColor: 'black',
+        color: 'white'
+      }
+    }
+
+    const classes = [];
+    if(this.state.persons.length <= 2){
+      classes.push('red')
+    }
+    if(this.state.persons.length <= 1){
+      classes.push('bold')
     }
 
     return (
+      <StyleRoot>
       <div className="App">
         <h1>Hi, I'm a React App</h1>
-        <p>This is really working!</p>
+        <p className ={classes.join(' ')}>This is really working!</p>
         <button style={style} onClick={this.togglePersonsHandler }>Toggle Persons</button>
         {persons}
       </div>
+      </StyleRoot>
     );
     // return React.createElement('div', {className: 'App'}, React.createElement('h1', null, 'Does this work now?'));
   }
 }
 
-export default App;
+export default Radium(App);
